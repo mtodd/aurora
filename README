@@ -1,0 +1,83 @@
+= Aurora
+== Simple Authentication Server
+
+Aurora is a simple approach to authenticating users for applications with
+varied permissions requirements and abstracting away the distinct
+authentication process from the application in order to keep the application
+flexible.
+
+== Halcyon
+
+Aurora is written on top of Halcyon, a JSON Web Server App Framework built on
+Rack. This allows for Aurora to be thin, lightweight, and fast.
+
+== Quick start
+
+Aurora is still very early in development so a quick start will probably
+consist mainly of checking out the code from the repository.
+
+== Installing with RubyGems
+
+A Gem of Aurora is available.  You can install it with:
+
+  $ sudo gem install aurora
+
+== Dependencies
+
+Aurora is directly dependent on Halcyon, which also includes a number of great
+gems:
+
+* merb
+* json
+* rack
+
+Aurora also requires a number of its own gems:
+
+* ...
+
+== Usage
+
+The +aurora+ command will assist you for running the server. Just run:
+
+  $ aurora -d -p 3800 example/simple
+
+== Contact
+
+Please mail bugs, suggestions and patches to <mailto:chiology@gmail.com>.
+
+You are also welcome to join the #aurora-sas channel on irc.freenode.net.
+
+Our website is up so stop by and check out what's going down. Our address is
+http://aurora.rubyforge.org/. On there you will find information about our
+mailing list as well, so do stop by.
+
+== License and Copyright
+
+Copyright (C) 2007 Matt Todd <http://purl.org/net/maraby>.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER 
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+== Links
+
+Halcyon:: <http://halcyon.rubyforge.org/>
+Aurora:: <http://aurora.rubyforge.org/>
+
+Rack:: <http://rack.rubyforge.org/>
+JSON:: <http://json.rubyforge.org/>
+
+Matt Todd:: <http://maraby.org/>
