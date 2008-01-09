@@ -22,7 +22,7 @@ project = {
     --line-numbers
     --inline-source
     --title "Aurora\ Documentation"
-    --exclude "^(_darcs|spec|pkg|.svn)/"
+    --exclude "^(_darcs|test|pkg|.svn)/"
   ],
   :dependencies => {
     'halcyon' => '>=0.3.22'
@@ -53,7 +53,7 @@ spec = Gem::Specification.new do |s|
   }
   s.requirements << project[:requirements]
   s.required_ruby_version = project[:ruby_version_required]
-  s.files = (project[:rdoc_files] + %w[Rakefile] + Dir["{spec,lib}/**/*"]).uniq
+  s.files = (project[:rdoc_files] + %w[Rakefile] + Dir["{test,lib}/**/*"]).uniq
 end
 
 Rake::GemPackageTask.new(spec) do |p|
@@ -76,17 +76,17 @@ end
 namespace 'spec' do
   desc "generate spec"
   task :gen do
-    sh "spec -c -rlib/aurora -rtest/spec_helper test/**/* --format s:test/SPEC --format h:test/SPEC.html"
+    sh "bacon -rlib/aurora -rtest/spec_helper test/**/* -s > test/SPEC"
   end
   
   desc "run rspec"
   task :run do
-    sh "spec -c -rlib/aurora -rtest/spec_helper test/**/*"
+    sh "bacon -rlib/aurora -rtest/spec_helper test/**/* -q"
   end
   
   desc "run rspec verbosely"
   task :verb do
-    sh "spec -c -rlib/aurora -rtest/spec_helper test/**/* --format s"
+    sh "bacon -rlib/aurora -rtest/spec_helper test/**/*"
   end
 end
 
