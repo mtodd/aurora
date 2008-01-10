@@ -81,12 +81,12 @@ namespace 'spec' do
   
   desc "run rspec"
   task :run do
-    sh "bacon -rlib/aurora -rtest/spec_helper test/**/* -q"
+    sh "bacon -r~/lib/bacon/output -rlib/aurora -rtest/spec_helper test/**/* -o CTestUnit"
   end
   
   desc "run rspec verbosely"
   task :verb do
-    sh "bacon -rlib/aurora -rtest/spec_helper test/**/*"
+    sh "bacon -r~/lib/bacon/output -rlib/aurora -rtest/spec_helper test/**/* -o CSpecDox"
   end
 end
 

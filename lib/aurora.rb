@@ -38,8 +38,8 @@ module Aurora
   # 
   # == Usage
   # 
-  # For documentation on using Aurora, check out the Halcyon::Server and
-  # Halcyon::Client classes which contain much more usage documentation.
+  # For documentation on using Aurora, check out the Aurora::Server and
+  # Aurora::Client classes which contain much more usage documentation.
   def introduction
     abort "READ THE DAMNED RDOCS!"
   end
