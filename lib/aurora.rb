@@ -7,21 +7,11 @@
 $:.unshift File.dirname(__FILE__)
 
 #--
-# dependencies
-#++
-
-%w(aurora/support/hashext).each {|dep|require dep}
-
-class Hash
-  include HashExt::Keys
-end
-
-#--
 # module
 #++
 
 module Aurora
-  VERSION = [0,1,1]
+  VERSION = [0,1,4]
   def self.version
     VERSION.join('.')
   end
@@ -44,6 +34,7 @@ module Aurora
     abort "READ THE DAMNED RDOCS!"
   end
   
+  autoload :Server, 'aurora/server'
+  autoload :Client, 'aurora/client'
+  
 end
-
-# %w(aurora/exceptions).each {|dep|require dep}

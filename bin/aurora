@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+halcyon -I lib -d -p 6467 -l /tmp/aurora.log -P /tmp/aurora.{port}.pid example/simple
