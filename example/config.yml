@@ -1,0 +1,20 @@
+host: localhost
+port: 6467
+server: mongrel
+pid_file: /tmp/aurora.{port}.pid
+log_file: /tmp/aurora.log
+log_level: debug
+environment: none
+
+# App specific configurations
+tokens:
+  # lifetime in minutes
+  lifetime: 5
+
+# Database configuration
+db:
+  adapter: mysql
+  host: localhost
+  username: authenticator
+  password: secret
+  database: auth

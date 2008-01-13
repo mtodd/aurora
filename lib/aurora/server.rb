@@ -11,7 +11,7 @@ $:.unshift File.dirname(__FILE__)
 # dependencies
 #++
 
-%w(rubygems halcyon/server digest/md5).each {|dep|require dep}
+%w(rubygems halcyon/server sequel digest/md5).each {|dep|require dep}
 
 #--
 # module
@@ -67,10 +67,13 @@ module Aurora
       # TODO: setup startup tasks
       
       # connect to database
+      @db = Sequel("#{@config[:db][:adapter]}://#{@config[:db][:username]}:#{@config[:db][:password]}@#{@config[:db][:host]}/#{@config[:db][:database]}")
       @logger.info 'Connected to Database.'
       
       # run migrations if version is outdated
-      @logger.info 'Migrations loaded!' if true
+      current_version = Sequel::Migrator.get_current_migration_version(@db)
+      latest_version = Sequel::Migrator.apply(@db, File.join(File.dirname(__FILE__),'migrations'))
+      @logger.info 'Migrations loaded!' if current_version < latest_version
       
       # clean expired sessions/tokens
       expire_tokens
@@ -93,8 +96,10 @@ module Aurora
         username, password = params[:username], @req.POST['password']
         if authenticate(username, password)
           # authenticated
-          # TODO: create token, return token
-          ok(Digest::MD5.hexdigest(Time.now.to_s))
+          token = Digest::MD5.hexdigest("#{username}:#{password}:#{Time.now.to_s}")
+          expiration = (Time.now + (@config[:tokens][:lifetime].to_i*60))
+          @db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
+          ok(token)
         else
           # failed authentication
           raise Exceptions::Unauthorized.new
@@ -154,7 +159,14 @@ module Aurora
       
       # Authenticates the token.
       def auth(params)
-        # TODO: authenticate token against database
+        expire_tokens
+        unless @db[:tokens].filter('token = ?', params[:token]).empty?
+          # authenticated
+          ok(params[:token])
+        else
+          # failed authentication
+          raise Exceptions::Unauthorized.new
+        end
       end
       
       def destroy(params)
@@ -173,8 +185,8 @@ module Aurora
     #++
     
     # Removes expired tokens.
-    def expire_tokens(token=nil)
-      # TODO: implement token expiration and removal
+    def expire_tokens
+      @db[:tokens].filter('expires_at < ?',Time.now).delete
     end
     
   end
