@@ -93,6 +93,8 @@ opts = OptionParser.new("", 24, '  ') do |opts|
   opts.separator ""
   opts.separator "Options:"
   
+  opts.on("-b", "--background", "process in the background (daemonize)") {$daemonize = true}
+  
   opts.on("-s", "--server SERVER", "serve using SERVER (default: #{options[:server]})") do |serv|
     options[:server] = serv
   end
@@ -181,6 +183,45 @@ rescue NameError
 end
 
 #--
+# daemonization
+#++
+
+if $daemonize
+  fork do
+    require 'daemons'
+    Daemonize.daemonize
+    
+    #--
+    # prepare app environment
+    #++
+    
+    case options[:environment]
+    when "development"
+      app = Rack::Builder.new {
+        use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
+        use Rack::ShowExceptions
+        use Rack::Reloader
+        use Rack::Lint
+        run app.new(options)
+      }.to_app
+    when "deployment"
+      app = Rack::Builder.new {
+        use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
+        run app.new(options)
+      }.to_app
+    else
+      app = app.new(options)
+    end
+    
+    #--
+    # start server
+    #++
+    
+    server.run app, :Port => options[:port]
+  end
+end
+
+#--
 # prepare app environment
 #++
 
@@ -206,4 +247,4 @@ end
 # start server
 #++
 
-server.run app, :Port => options[:port]
+server.run app, :Port => options[:port] unless $daemonize
