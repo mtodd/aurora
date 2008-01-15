@@ -11,7 +11,7 @@ $:.unshift File.dirname(__FILE__)
 # dependencies
 #++
 
-%w(rubygems halcyon/server sequel digest/md5).each {|dep|require dep}
+%w(rubygems aurora halcyon/server sequel digest/md5).each {|dep|require dep}
 
 #--
 # module
@@ -98,6 +98,7 @@ module Aurora
           # authenticated
           token = Digest::MD5.hexdigest("#{username}:#{password}:#{Time.now.to_s}")
           expiration = (Time.now + (@config[:tokens][:lifetime].to_i*60))
+          @db[:tokens].filter(:username => username).delete # removes previous tokens
           @db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
           ok(token)
         else

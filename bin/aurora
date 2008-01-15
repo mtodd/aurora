@@ -4,7 +4,7 @@
 #  Copyright (c) 2007. All rights reserved.
 #++
 
-$:.unshift('lib')
+$:.unshift(File.join(File.dirname(__FILE__),'lib'))
 
 #--
 # dependencies
@@ -57,7 +57,7 @@ opts = OptionParser.new("", 24, '  ') do |opts|
       # load the config file
       begin
         conf = YAML.load_file(conf_file)
-      rescue Errno::EACCES
+      rescue Errno::EACCES => e
         abort("Can't access #{conf_file}, try 'sudo #{$0}'")
       end
       
@@ -147,15 +147,20 @@ options[:app] = ARGV.shift
 # load app
 #++
 
-if !File.exists?("#{options[:app]}.rb")
-  abort "Aurora did not find the app #{options[:app]}. Check your path and try again."
+begin
+  # go ahead and try to require since it could be a gem
+  require options[:app]
+rescue
+  if !File.exists?("#{options[:app]}.rb")
+    abort "Aurora did not find the app #{options[:app]}. Check your path and try again."
+  end
 end
 
 begin
-  require options[:app]
-  app = Object.const_get(File.basename(options[:app]).capitalize.gsub(/_([a-z])/){|m|m[1].chr.capitalize})
+  appname = File.basename(options[:app]).capitalize.gsub(/_([a-z])/){|m|m[1].chr.capitalize}
+  app = Object.const_get(appname)
 rescue NameError => e
-  abort "Unable to load #{File.basename(options[:app]).capitalize.gsub(/_([a-z])/){|m|m[1].chr.capitalize}}. Please ensure your server is so named."
+  abort "Unable to load #{appname}. Please ensure your server is so named."
 end
 
 #--
