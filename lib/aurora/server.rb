@@ -96,10 +96,18 @@ module Aurora
         username, password = params[:username], @req.POST['password']
         if authenticate(username, password)
           # authenticated
+          
+          # generate token and expiration date
           token = Digest::MD5.hexdigest("#{username}:#{password}:#{Time.now.to_s}")
           expiration = (Time.now + (@config[:tokens][:lifetime].to_i*60))
+          
+          # save to the DB
           @db[:tokens].filter(:username => username).delete # removes previous tokens
           @db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
+          
+          # TODO: cache the password for the user, creating the user if necessary
+          
+          # return success with token for client
           ok(token)
         else
           # failed authentication
@@ -160,9 +168,13 @@ module Aurora
       
       # Authenticates the token.
       def auth(params)
-        expire_tokens
-        unless @db[:tokens].filter('token = ?', params[:token]).empty?
+        # expire_tokens # TODO: investigate how much of a performance hit checking (and deleting) is
+        unless @db[:tokens].filter('token = ? AND expires_at < ?', params[:token], Time.now).empty?
           # authenticated
+          
+          # TODO: update the expiration date if close to expiring
+          
+          # return success and token for client
           ok(params[:token])
         else
           # failed authentication
@@ -171,13 +183,14 @@ module Aurora
       end
       
       def destroy(params)
-        # TODO: destroy token forcefully
+        @db[:tokens].filter(:token => params[:token]).delete
+        ok
       end
       
     end
     
     # The default unauthorized action which raises an Unauthorized exception
-    def unauthorized(params)
+    def unauthorized(params={})
       raise Exceptions::Unauthorized.new
     end
     
