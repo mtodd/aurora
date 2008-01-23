@@ -169,7 +169,7 @@ module Aurora
       # Authenticates the token.
       def auth(params)
         # expire_tokens # TODO: investigate how much of a performance hit checking (and deleting) is
-        unless @db[:tokens].filter('token = ? AND expires_at < ?', params[:token], Time.now).empty?
+        unless @db[:tokens].filter('token = ? AND expires_at > ?', params[:token], Time.now).empty?
           # authenticated
           
           # TODO: update the expiration date if close to expiring
