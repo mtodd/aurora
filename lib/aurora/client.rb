@@ -30,6 +30,22 @@ module Aurora
       VERSION.join('.')
     end
     
+    # Performs an authentication action against the current Aurora server.
+    # 
+    # Expects a Hash with either a <tt>:username</tt> and <tt>:password</tt>
+    # pair or a single <tt>:token</tt> option. The server authentication
+    # method is called accordingly.
+    def self.authenticate(options = {})
+      if user, pass = options[:username], options[:password]
+        user, pass = options[:username], options[:password]
+        post("/user/auth/#{user}", :password => pass)[:body] rescue false
+      elsif token = options[:token]
+        get("/token/auth/#{token}") rescue false 
+      else
+        false
+      end
+    end
+    
   end
   
 end
