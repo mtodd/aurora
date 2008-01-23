@@ -24,7 +24,7 @@ module Aurora
   # The Aurora Client makes interfacing with the Aurora server very simple and
   # easy, hiding away most of the communication details while still allowing
   # for a great deal of control in creating requests for the server.
-  class Client
+  class Client < Halcyon::Client::Base
     
     def self.version
       VERSION.join('.')
