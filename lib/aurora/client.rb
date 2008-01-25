@@ -26,7 +26,7 @@ module Aurora
   # for a great deal of control in creating requests for the server.
   class Client < Halcyon::Client::Base
     
-    attr_accessor :app_id
+    attr_accessor :app
     
     def self.version
       VERSION.join('.')
@@ -37,7 +37,7 @@ module Aurora
     # against. The App ID can also be used to configure default permissions for
     # newly created user accounts (from fresh LDAP auths, for instance).
     def initialize(uri, app)
-      @app_id = app
+      @app = app
       super uri
     end
     
