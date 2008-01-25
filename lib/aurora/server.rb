@@ -54,8 +54,8 @@ module Aurora
       r.match('/token/destroy/:token').to(:module => 'token', :action => 'destroy')
       
       # permission routes
-      r.match('/user/:username/permissions').to(:module => 'user', :action => 'permisisons')
-      r.match('/user/:username/permit/:permission').to(:module => 'user', :action => 'permit')
+      r.match('/user/:username/:app/permissions').to(:module => 'user', :action => 'permisisons')
+      r.match('/user/:username/:app/permit/:permission').to(:module => 'user', :action => 'permit')
       
       # failover
       {:action => 'unauthorized'}
@@ -148,12 +148,38 @@ module Aurora
       
       # Does the user have permission?
       def permit?(params)
-        # TODO: implement permission checking
+        username, app, permission = params[:username], params[:app], params[:permission]
+        
+        # pull the permissions for the user
+        perms = JSON.parse(@db[:users][:username => username][:permissions])
+        
+        # test the permissions
+        unless perms[app].nil?
+          ok(perms[app][permission])
+        else
+          # no permissions were found for the given app
+          ok(false)
+        end
       end
       
       # Give permissions to user
       def permit!(params)
-        # TODO: implement permission management
+        username, app, permission, value = params[:username], params[:app], params[:permission], post[:value]
+        
+        # pull the permissions for the user
+        perms = JSON.parse(@db[:users][:username => username][:permissions])
+        
+        # test the permissions
+        unless perms[app].nil?
+          if perms[app][permission] == value
+            ok(true)
+          else
+            raise Exceptions::Unauthorized.new
+          end
+        else
+          # no permissions were found for the given app
+          raise Exceptions::Unauthorized.new
+        end
       end
       
     end

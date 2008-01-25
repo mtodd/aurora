@@ -26,8 +26,19 @@ module Aurora
   # for a great deal of control in creating requests for the server.
   class Client < Halcyon::Client::Base
     
+    attr_accessor :app_id
+    
     def self.version
       VERSION.join('.')
+    end
+    
+    # Initialies the Aurora client, expecting the Aurora server to connect to
+    # and the application to represent itself as to query permissions and such
+    # against. The App ID can also be used to configure default permissions for
+    # newly created user accounts (from fresh LDAP auths, for instance).
+    def initialize(uri, app)
+      @app_id = app
+      super uri
     end
     
     # Performs an authentication action against the current Aurora server.
@@ -45,6 +56,14 @@ module Aurora
       else
         false
       end
+    end
+    
+    def permit?(user, app, permission)
+      get("/user/#{user}/#{app}/permit/#{permission}")[:body]
+    end
+    
+    def permit!(user, app, permission, value)
+      get("/user/#{user}/#{app}/permit/#{permission}", :value => value)[:body] rescue false
     end
     
   end
