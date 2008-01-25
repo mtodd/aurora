@@ -58,12 +58,12 @@ module Aurora
       end
     end
     
-    def permit?(user, app, permission)
-      get("/user/#{user}/#{app}/permit/#{permission}")[:body]
+    def permit?(user, permission)
+      get("/user/#{user}/#{@app}/permit/#{permission}")[:body]
     end
     
-    def permit!(user, app, permission, value)
-      post("/user/#{user}/#{app}/permit/#{permission}", :value => value)[:body] rescue false
+    def permit!(user, permission, value)
+      post("/user/#{user}/#{@app}/permit/#{permission}", :value => value)[:body]
     end
     
   end
