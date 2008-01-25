@@ -99,13 +99,24 @@ module Aurora
           
           # generate token and expiration date
           token = Digest::MD5.hexdigest("#{username}:#{password}:#{Time.now.to_s}")
-          expiration = (Time.now + (@config[:tokens][:lifetime].to_i*60))
+          expiration = generate_expiration
           
           # save to the DB
           @db[:tokens].filter(:username => username).delete # removes previous tokens
           @db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
           
-          # TODO: cache the password for the user, creating the user if necessary
+          # create the user if not already in the DB
+          if @db[:users].filter(:username => username).empty?
+          	# retrieve the new user permissions
+          	permissions = initialize_permissions(username)
+          	
+          	# create a new user
+          	@db[:users] << {:username => username, :password => Digest::MD5.hexdigest(password), :permissions => permissions.to_json}
+          else
+          	# or just cache the password so the user's profile is up-to-date
+          	# if the authentication source is not available
+          	@db[:users].filter(:username => username).update(:password => Digest::MD5.hexdigest(password))
+          end
           
           # return success with token for client
           ok(token)
@@ -198,7 +209,10 @@ module Aurora
         unless @db[:tokens].filter('token = ? AND expires_at > ?', params[:token], Time.now).empty?
           # authenticated
           
-          # TODO: update the expiration date if close to expiring
+          # update the expiration date if close to expiring
+          unless @db[:tokens].filter('token = ? AND expires_at <= ?', params[:token], generate_expiration(15)).empty?
+          	@db[:tokens].filter(:token => params[:token]).update(:expires_at => generate_expiration)
+          end
           
           # return success and token for client
           ok(params[:token])
@@ -229,6 +243,22 @@ module Aurora
       @db[:tokens].filter('expires_at < ?',Time.now).delete
     end
     
+    # Sets up a given user's permissions. Overwrite this method to specify more
+    # specific or dynamic default permissions, for instance connecting to LDAP
+    # to determine department and granting permissions that way.
+    def initialize_permissions(username)
+    	# by default, no permissions are setup
+    	# the returned value is JSON-ized
+    	{}
+    end
+    
+    # Generates a new time to expire from the minutes given, defaulting to the
+    # number of minutes given as a token lifetime in the configuration file.
+    def generate_expiration(lifetime=@config[:tokens][:lifetime])
+    	(Time.now + (lifetime.to_i*60))
+    end
+    
   end
   
 end
+
