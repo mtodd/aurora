@@ -63,7 +63,7 @@ module Aurora
     end
     
     def permit!(user, app, permission, value)
-      get("/user/#{user}/#{app}/permit/#{permission}", :value => value)[:body] rescue false
+      post("/user/#{user}/#{app}/permit/#{permission}", :value => value)[:body] rescue false
     end
     
   end
