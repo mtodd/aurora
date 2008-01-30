@@ -112,10 +112,12 @@ module Aurora
           	
           	# create a new user
           	@db[:users] << {:username => username, :password => Digest::MD5.hexdigest(password), :permissions => permissions.to_json}
+          	@logger.info "#{username} cached."
           else
           	# or just cache the password so the user's profile is up-to-date
           	# if the authentication source is not available
           	@db[:users].filter(:username => username).update(:password => Digest::MD5.hexdigest(password))
+          	@logger.debug "#{username} updated."
           end
           
           # return success with token for client
