@@ -25,7 +25,7 @@ project = {
     --exclude "^(_darcs|test|pkg|.svn)/"
   ],
   :dependencies => {
-    'halcyon' => '>=0.3.22'
+    'halcyon' => '>=0.3.28'
   },
   :requirements => '',
   :ruby_version_required => '>=1.8.6'

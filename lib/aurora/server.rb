@@ -92,7 +92,7 @@ module Aurora
       
       # Calls the supplied authentication method. Creates a token on success,
       # returning that token, and raises Unauthorized on failure.
-      def auth(params)
+      def auth
         username, password = params[:username], @req.POST['password']
         if authenticate(username, password)
           # authenticated
@@ -133,7 +133,7 @@ module Aurora
       #++
       
       # Show user data.
-      def show(params)
+      def show
         # TODO: consider removing as potentially unsafe
       end
       
@@ -142,7 +142,7 @@ module Aurora
       #++
       
       # Request the full permissions of a given user
-      def permissions(params)
+      def permissions
         # TODO: consider removing as potentially unsafe
         # (in the event a malicious user wants to model a super user with a real
         # super user's permissions)
@@ -150,17 +150,17 @@ module Aurora
       
       # Handles action branching depending on the method for permission setting
       # or getting. Defers to +permit?+ and +permit!+.
-      def permit(params)
+      def permit
         case method
         when :get
-          permit?(params)
+          permit?
         when :post
-          permit!(params)
+          permit!
         end
       end
       
       # Does the user have permission?
-      def permit?(params)
+      def permit?
         username, app, permission = params[:username], params[:app], params[:permission]
         
         # pull the permissions for the user
@@ -176,7 +176,7 @@ module Aurora
       end
       
       # Give permissions to user
-      def permit!(params)
+      def permit!
         username, app, permission, value = params[:username], params[:app], params[:permission], post[:value]
         
         # pull the permissions for the user
@@ -206,7 +206,7 @@ module Aurora
     token do
       
       # Authenticates the token.
-      def auth(params)
+      def auth
         # expire_tokens # TODO: investigate how much of a performance hit checking (and deleting) is
         unless @db[:tokens].filter('token = ? AND expires_at > ?', params[:token], Time.now).empty?
           # authenticated
@@ -224,7 +224,7 @@ module Aurora
         end
       end
       
-      def destroy(params)
+      def destroy
         @db[:tokens].filter(:token => params[:token]).delete
         ok
       end
@@ -263,4 +263,3 @@ module Aurora
   end
   
 end
-
