@@ -67,7 +67,8 @@ module Aurora
       # TODO: setup startup tasks
       
       # connect to database
-      @db = Sequel("#{@config[:db][:adapter]}://#{@config[:db][:username]}:#{@config[:db][:password]}@#{@config[:db][:host]}/#{@config[:db][:database]}")
+      credentials = "#{@config[:db][:username]}:#{@config[:db][:password]}@" unless @config[:db][:username].nil?
+      @db = Sequel("#{@config[:db][:adapter]}://#{credentials}#{@config[:db][:host]}/#{@config[:db][:database]}")
       @logger.info 'Connected to Database.'
       
       # run migrations if version is outdated
