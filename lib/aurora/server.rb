@@ -57,6 +57,12 @@ module Aurora
       r.match('/user/:username/:app/permissions').to(:module => 'user', :action => 'permisisons')
       r.match('/user/:username/:app/permit/:permission').to(:module => 'user', :action => 'permit')
       
+      # generic
+      r.match('/:module/:action/:id').to()
+      r.match('/:module/:action').to()
+      r.match('/:action/:id').to()
+      r.match('/:action').to()
+      
       # failover
       {:action => 'unauthorized'}
     end
@@ -68,7 +74,7 @@ module Aurora
       
       # connect to database
       host = credentials = ''
-      host = "#{@config[:db][:host]}/" unless @config[:db][:host]
+      host = "#{@config[:db][:host]}/" unless @config[:db][:host].nil?
       credentials = "#{@config[:db][:username]}:#{@config[:db][:password]}@" unless @config[:db][:username].nil?
       @db = Sequel("#{@config[:db][:adapter]}://#{credentials}#{host}#{@config[:db][:database]}")
       @logger.info 'Connected to Database.'
