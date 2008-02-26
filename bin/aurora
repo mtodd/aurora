@@ -170,7 +170,7 @@ end
 #++
 begin
   case options[:server]
-  when 'thin'
+  when 'swift-thin'
     require 'thin'
     server = Rack::Handler::Thin
     server = Controllers::Controller.new({
@@ -183,7 +183,7 @@ begin
       :max_conns => 1024,
       :max_persistent_conns => 512
     })
-  when 'mongrel'
+  when 'swift-mongrel'
     require 'swiftcore/swiftiplied_mongrel'
     require 'mongrel'
     server = Rack::Handler::Mongrel
