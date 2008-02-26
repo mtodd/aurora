@@ -95,7 +95,7 @@ module Halcyon
         
         # prepare and send HTTP request
         serv = Net::HTTP.new(@uri.host, @uri.port)
-        serv.use_ssl = true
+        serv.use_ssl = true if @uri.scheme == 'https'
         res = serv.start {|http|http.request(req)}
         
         # parse response
