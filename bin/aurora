@@ -18,6 +18,7 @@ $:.unshift(File.join(File.dirname(__FILE__),'lib'))
 
 $debug = false
 $test = false
+$daemonize = false
 options = Halcyon::Server::DEFAULT_OPTIONS
 
 #--
@@ -148,7 +149,6 @@ options[:app] = ARGV.shift
 #--
 # load app
 #++
-
 begin
   # go ahead and try to require since it could be a gem
   require options[:app]
@@ -169,66 +169,47 @@ end
 # prepare server
 #++
 begin
-  server = Rack::Handler.const_get(options[:server].capitalize)
-rescue NameError
-  servers = {
-    'cgi'     => 'CGI',
-    'fastcgi' => 'FastCGI',
-    'lsws'    => 'LSWS',
-    'mongrel' => 'Mongrel',
-    'webrick' => 'WEBrick'
-  }
-  abort "Unsupported server (missing Rack Handler). Did you mean to specify #{options[:server]}?" unless servers.key? options[:server]
-  server = Rack::Handler.const_get(servers[options[:server]])
-end
-
-#--
-# daemonization
-#++
-
-if $daemonize
-  fork do
-    require 'daemons'
-    Daemonize.daemonize
-    
-    #--
-    # prepare app environment
-    #++
-    
-    case options[:environment]
-    when "development"
-      app = Rack::Builder.new {
-        use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
-        use Rack::ShowExceptions
-        use Rack::Reloader
-        use Rack::Lint
-        run app.new(options)
-      }.to_app
-    when "deployment"
-      app = Rack::Builder.new {
-        use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
-        run app.new(options)
-      }.to_app
-    else
-      app = app.new(options)
-    end
-    
-    #--
-    # start server
-    #++
-    
-    server.run app, :Port => options[:port]
+  case options[:server]
+  when 'thin'
+    require 'thin'
+    server = Rack::Handler::Thin
+    server = Controllers::Controller.new({
+      :swiftiply => '',
+      :chdir => Dir.pwd,
+      :log => options[:log_file],
+      :pid => options[:pid_file],
+      :environment => 'development',
+      :timeout => 30,
+      :max_conns => 1024,
+      :max_persistent_conns => 512
+    })
+  when 'mongrel'
+    require 'swiftcore/swiftiplied_mongrel'
+    require 'mongrel'
+    server = Rack::Handler::Mongrel
+  else
+    warn 'Aurora is not running behind an SSL connection-capable server. Authenticate at your own risk.'
+    servers = {
+      'cgi'     => 'CGI',
+      'fastcgi' => 'FastCGI',
+      'lsws'    => 'LSWS',
+      'mongrel' => 'Mongrel',
+      'webrick' => 'WEBrick',
+      'thin'    => 'Thin'
+    }
+    server = Rack::Handler.const_get(servers[options[:server]].to_sym)
   end
+rescue NameError
+  abort "Unsupported server (missing Rack Handler). Did you mean to specify #{options[:server]}?"
 end
 
 #--
 # prepare app environment
 #++
-
 case options[:environment]
 when "development"
   app = Rack::Builder.new {
-    use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
+    use Rack::CommonLogger, STDERR unless server.name =~ /CGI/
     use Rack::ShowExceptions
     use Rack::Reloader
     use Rack::Lint
@@ -236,7 +217,7 @@ when "development"
   }.to_app
 when "deployment"
   app = Rack::Builder.new {
-    use Rack::CommonLogger, STDERR  unless server.name =~ /CGI/
+    use Rack::CommonLogger, STDERR unless server.name =~ /CGI/
     run app.new(options)
   }.to_app
 else
@@ -246,5 +227,13 @@ end
 #--
 # start server
 #++
-
-server.run app, :Port => options[:port] unless $daemonize
+unless $daemonize
+  server.run app, :Port => options[:port].to_i
+else
+  fork do
+    require 'daemons'
+    Daemonize.daemonize
+    
+    server.run app, :Port => options[:port].to_i
+  end
+end
