@@ -69,3 +69,50 @@ module Aurora
   end
   
 end
+
+require 'net/https'
+
+module Halcyon
+  class Client
+    
+    class Base
+      
+    private
+      
+      def request(req, headers={})
+        # define essential headers for Halcyon::Server's picky requirements
+        req["Content-Type"] = CONTENT_TYPE
+        req["User-Agent"] = USER_AGENT
+        
+        # apply provided headers
+        headers.each do |pair|
+          header, value = pair
+          req[header] = value
+        end
+        
+        # provide hook for modifying the headers
+        req = headers(req) if respond_to? :headers
+        
+        # prepare and send HTTP request
+        serv = Net::HTTP.new(@uri.host, @uri.port)
+        serv.use_ssl = true
+        res = serv.start {|http|http.request(req)}
+        
+        # parse response
+        body = JSON.parse(res.body)
+        body.symbolize_keys!
+        
+        # handle non-successes
+        raise Halcyon::Client::Base::Exceptions.lookup(body[:status]).new unless res.kind_of? Net::HTTPSuccess
+        
+        # return response
+        body
+      rescue Halcyon::Exceptions::Base => e
+        # log exception if logger is in place
+        raise
+      end
+      
+    end
+    
+  end
+end
