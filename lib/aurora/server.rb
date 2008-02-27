@@ -77,6 +77,7 @@ module Aurora
       host = "#{@config[:db][:host]}/" unless @config[:db][:host].nil?
       credentials = "#{@config[:db][:username]}:#{@config[:db][:password]}@" unless @config[:db][:username].nil?
       @db = Sequel("#{@config[:db][:adapter]}://#{credentials}#{host}#{@config[:db][:database]}")
+      @db.logger = @logger if $debug
       @logger.info 'Connected to Database.'
       
       # run migrations if version is outdated
