@@ -116,7 +116,7 @@ module Aurora
           @db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
           
           # create the user if not already in the DB
-          if @db[:users].filter(:username => username).empty?
+          if @db[:users].filter(:username => username).all.empty?
           	# retrieve the new user permissions
           	permissions = initialize_permissions(username)
           	
