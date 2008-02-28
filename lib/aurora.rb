@@ -11,7 +11,7 @@ $:.unshift File.dirname(__FILE__)
 #++
 
 module Aurora
-  VERSION = [0,1,11]
+  VERSION = [0,2,0]
   def self.version
     VERSION.join('.')
   end
