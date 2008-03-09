@@ -4,7 +4,7 @@ module Aurora
   module Authenticator
     
     # A simple authenticator
-    class Simple # < Aurora::Authenticator::Base # needed?
+    module Simple # < Aurora::Authenticator::Base # needed?
       
       CREDENTIALS = {
         # USERNAME => PASSWORD
@@ -19,6 +19,7 @@ module Aurora
       
       # Simply authenticates against a pair in the CREDENTIALS constant.
       def authenticate(user, pass)
+        self.logger.debug "#{user} : #{pass}"
         Digest::MD5.hexdigest(pass) == CREDENTIALS[user]
       end
       

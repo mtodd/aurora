@@ -1,5 +1,14 @@
 class Application < Halcyon::Controller
   
+  attr_accessor :db
+  def db
+    self.class.db
+  end
+  
+  def logger
+    Halcyon.logger
+  end
+  
   # The default unauthorized action which raises an Unauthorized exception
   def unauthorized
     raise Unauthorized.new
@@ -8,11 +17,6 @@ class Application < Halcyon::Controller
   #--
   # Utility methods
   #++
-  
-  # Removes expired tokens.
-  def expire_tokens
-    @db[:tokens].filter('expires_at < ?',Time.now).delete
-  end
   
   # Sets up a given user's permissions. Overwrite this method to specify more
   # specific or dynamic default permissions, for instance connecting to LDAP
@@ -25,7 +29,7 @@ class Application < Halcyon::Controller
   
   # Generates a new time to expire from the minutes given, defaulting to the
   # number of minutes given as a token lifetime in the configuration file.
-  def generate_expiration(lifetime=@config[:tokens][:lifetime])
+  def generate_expiration(lifetime=Halcyon.config[:tokens][:lifetime])
   	(Time.now + (lifetime.to_i*60))
   end
   

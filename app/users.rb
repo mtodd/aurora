@@ -20,29 +20,29 @@ class Users < Application
       expiration = generate_expiration
       
       # save to the DB
-      @db[:tokens].filter(:username => username).delete # removes previous tokens
-      @db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
+      self.db[:tokens].filter(:username => username).delete # removes previous tokens
+      self.db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
       
       # create the user if not already in the DB
-      if @db[:users].filter(:username => username).all.empty?
+      if self.db[:users].filter(:username => username).all.empty?
       	# retrieve the new user permissions
       	permissions = initialize_permissions(username)
       	
       	# create a new user
-      	@db[:users] << {:username => username, :password => Digest::MD5.hexdigest(password), :permissions => permissions.to_json}
-      	@logger.info "#{username} cached."
+      	self.db[:users] << {:username => username, :password => Digest::MD5.hexdigest(password), :permissions => permissions.to_json}
+      	self.logger.info "#{username} cached."
       else
       	# or just cache the password so the user's profile is up-to-date
       	# if the authentication source is not available
-      	@db[:users].filter(:username => username).update(:password => Digest::MD5.hexdigest(password))
-      	@logger.debug "#{username} updated."
+      	self.db[:users].filter(:username => username).update(:password => Digest::MD5.hexdigest(password))
+      	self.logger.debug "#{username} updated."
       end
       
       # return success with token for client
       ok(token)
     else
       # failed authentication
-      raise Exceptions::Unauthorized.new
+      raise Unauthorized.new
     end
   end
   
@@ -105,11 +105,11 @@ class Users < Application
       if perms[app][permission] == value
         ok(true)
       else
-        raise Exceptions::Unauthorized.new
+        raise Unauthorized.new
       end
     else
       # no permissions were found for the given app
-      raise Exceptions::Unauthorized.new
+      raise Unauthorized.new
     end
   end
   

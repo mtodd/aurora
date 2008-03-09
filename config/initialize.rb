@@ -2,7 +2,7 @@
 %w(sequel digest/md5).each {|dep|require dep}
 
 # = Initialization
-class Aurora::Application
+class Halcyon::Application
   
   # Makes sure the Database server connection is created, tables migrated, and
   # expired tokens are cleaned.
@@ -10,19 +10,25 @@ class Aurora::Application
     # connect to database
     host = credentials = ''
     host = "#{config[:db][:host]}/" unless config[:db][:host].nil?
-    credentials = "#{config[:db][:username]}:#{config[:db][:password]}@" unless@config[:db][:username].nil?
+    credentials = "#{config[:db][:username]}:#{config[:db][:password]}@" unless config[:db][:username].nil?
     @db = Sequel("#{config[:db][:adapter]}://#{credentials}#{host}#{config[:db][:database]}")
-    @db.logger = @logger if $debug
-    @logger.info 'Connected to Database.'
+    @db.logger = self.logger if $debug
+    self.logger.info 'Connected to Database.'
     
     # run migrations if version is outdated
     current_version = Sequel::Migrator.get_current_migration_version(@db)
     latest_version = Sequel::Migrator.apply(@db, File.join(File.dirname(__FILE__),'..','lib','migrations'))
-    @logger.info 'Migrations loaded!' if current_version < latest_version
+    self.logger.info 'Migrations loaded!' if current_version < latest_version
     
     # clean expired sessions/tokens
-    expire_tokens
-    @logger.info 'Expired sessions/tokens removed.'
+    @db[:tokens].filter('expires_at < ?',Time.now).delete
+    self.logger.info 'Expired sessions/tokens removed.'
+    
+    # Hook up the Authenticator
+    authenticator = config[:authenticator]
+    require Halcyon.root/'config'/authenticator
+    ::Users.__send__ :include, Aurora::Authenticator.const_get(authenticator.camel_case.to_sym)
+    self.logger.info "#{authenticator.camel_case} Authenticator loaded."
   end
   
   # = Routes
@@ -48,7 +54,7 @@ class Aurora::Application
     r.match('/:action').to()
     
     # failover
-    {:action => 'unauthorized'}
+    {:action => 'not_found'}
   end
   
 end
