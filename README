@@ -1,45 +1,36 @@
 = Aurora
-== Simple Authentication Server
+== Simple Authentication and and User Management System
 
 Aurora is a simple approach to authenticating users for applications with
 varied permissions requirements and abstracting away the distinct
 authentication process from the application in order to keep the application
 flexible.
 
+This allows for multiple applications all to interface with the same process
+and not be concerned about the changing authentication process: switching
+processes can be transparent to all of your apps.
+
 == Halcyon
 
 Aurora is written on top of Halcyon, a JSON Web Server App Framework built on
 Rack. This allows for Aurora to be thin, lightweight, and fast.
 
-== Quick start
+== Development Status
 
-Aurora is still very early in development so a quick start will probably
-consist mainly of checking out the code from the repository.
+Aurora is currently under restructure as Halcyon moves to a new architecture.
+Documentation will be updated accordingly. These changes will make it easier to
+specialize the authentication process and other features of Aurora to better
+match the needs of your environment.
 
-== Installing with RubyGems
+== Notes And Considerations
 
-A Gem of Aurora is available.  You can install it with:
+For the Authenticator class, have it test to see if self.authenticate is
+defined, otherwise, use #authenticate so Authenticators don't have to be
+instanciated unless they need to define initialize for connecting to
+resources, etc.
 
-  $ sudo gem install aurora
-
-== Dependencies
-
-Aurora is directly dependent on Halcyon, which also includes a number of great
-gems:
-
-* merb
-* json
-* rack
-
-Aurora also requires a number of its own gems:
-
-* ...
-
-== Usage
-
-The +aurora+ command will assist you for running the server. Just run:
-
-  $ aurora -d -p 3800 example/simple
+This might also be addressed if Authenticators have to inherit from a Base
+Authenticator which can provide a hook for self.startup, for instance.
 
 == Contact
 

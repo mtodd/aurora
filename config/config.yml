@@ -1,10 +1,6 @@
-host: localhost
-port: 6467
-server: mongrel
-pid_file: /tmp/aurora.{port}.pid
-log_file: /tmp/aurora.log
+log_file: /tmp/aurora.log # blank for STDOUT
 log_level: debug
-environment: none
+allow_from: all
 
 # App specific configurations
 tokens:
