@@ -1,13 +1,6 @@
 class Application < Halcyon::Controller
   
   attr_accessor :db
-  def db
-    self.class.db
-  end
-  
-  def logger
-    Halcyon.logger
-  end
   
   # The default unauthorized action which raises an Unauthorized exception
   def unauthorized
