@@ -2,7 +2,7 @@
 
 // The locaton of the Halcyon PHP client (a dependency) is
 // http://github.com/mtodd/halcyon.
-if(!defined(Halcyon)) require_once(dirname(__FILE__).'/lib/halcyon.php');
+if(!class_exists(Halcyon)) require_once(dirname(__FILE__).'/lib/halcyon.php');
 
 class Aurora extends Halcyon {
   
