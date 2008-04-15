@@ -35,7 +35,7 @@ module Aurora
       if user && pass
         post("/user/auth/#{user}", :password => pass)[:body] rescue false
       elsif token
-        get("/token/auth/#{token}") rescue false 
+        get("/token/auth/#{token}")[:body] rescue false 
       else
         false
       end
