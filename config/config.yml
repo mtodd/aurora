@@ -1,5 +1,7 @@
-log_file: # /tmp/aurora.log # blank for STDOUT
-log_level: debug
+logging:
+  type: Logger
+  file: /var/log/aurora.log
+  level: info
 allow_from: all
 
 # App specific configurations
@@ -7,11 +9,3 @@ authenticator: simple
 tokens:
   # lifetime in minutes
   lifetime: 5
-
-# Database configuration
-db:
-  adapter: mysql
-  host: localhost
-  username: authenticator
-  password: 584WeW6
-  database: auth
