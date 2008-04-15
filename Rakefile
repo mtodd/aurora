@@ -25,7 +25,8 @@ project = {
     --exclude "^(_darcs|test|pkg|.svn)/"
   ],
   :dependencies => {
-    'halcyon' => '>=0.3.28'
+    'halcyon' => '>=0.5.0',
+    'sequel' => '>=1.4.0'
   },
   :requirements => '',
   :ruby_version_required => '>=1.8.6'
@@ -99,7 +100,7 @@ def manifest
   manifest = File.new('MANIFEST', 'w+')
   Find.find('.') do |path|
     path.gsub!(/\A\.\//, '')
-    next if path =~ /(\.svn|doc|pkg|^\.|MANIFEST)/
+    next if path =~ /(\.git|\.gitignore|\.svn|doc|pkg|^\.|MANIFEST)/
     paths << path
   end
   paths.sort.each do |path|
@@ -121,7 +122,7 @@ end
 
 desc "Generate a CHANGELOG"
 task :changelog do
-  sh "svn log > CHANGELOG"
+  sh "git log > CHANGELOG"
 end
 
 desc "Generate RDoc documentation"
@@ -132,9 +133,9 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
     '--charset' << 'utf-8'
   rdoc.rdoc_dir = "doc"
   rdoc.rdoc_files.include 'README'
-  rdoc.rdoc_files.include('lib/aurora.rb')
-  rdoc.rdoc_files.include('lib/aurora/*.rb')
-  rdoc.rdoc_files.include('lib/aurora/*/*.rb')
+  rdoc.rdoc_files.include('lib/*.rb')
+  rdoc.rdoc_files.include('app/*.rb')
+  rdoc.rdoc_files.include('config/*.rb')
 end
 
 task :pushsite => [:rdoc] do

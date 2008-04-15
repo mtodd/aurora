@@ -9,12 +9,12 @@ class Tokens < Application
   # Authenticates the token.
   def auth
     # expire_tokens # TODO: investigate how much of a performance hit checking (and deleting) is
-    unless self.db[:tokens].filter('token = ? AND expires_at > ?', params[:token], Time.now).all.empty?
+    unless Aurora::DB[:tokens].filter('token = ? AND expires_at > ?', params[:token], Time.now).all.empty?
       # authenticated
       
       # update the expiration date if close to expiring
-      unless self.db[:tokens].filter('token = ? AND expires_at <= ?', params[:token], generate_expiration(15)).all.empty?
-      	self.db[:tokens].filter(:token => params[:token]).update(:expires_at => generate_expiration)
+      unless Aurora::DB[:tokens].filter('token = ? AND expires_at <= ?', params[:token], generate_expiration(15)).all.empty?
+      	Aurora::DB[:tokens].filter(:token => params[:token]).update(:expires_at => generate_expiration)
       end
       
       # return success and token for client
@@ -26,13 +26,13 @@ class Tokens < Application
   end
   
   def destroy
-    self.db[:tokens].filter(:token => params[:token]).delete
+    Aurora::DB[:tokens].filter(:token => params[:token]).delete
     ok
   end
   
   # Removes expired tokens.
   def expire_tokens
-    self.db[:tokens].filter('expires_at < ?',Time.now).delete
+    Aurora::DB[:tokens].filter('expires_at < ?',Time.now).delete
   end
   
 end

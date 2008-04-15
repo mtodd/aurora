@@ -1,21 +1,4 @@
-#!/usr/bin/env ruby
-#--
-#  Created by Matt Todd on 2008-01-11.
-#  Copyright (c) 2008. All rights reserved.
-#++
-
-$:.unshift File.dirname(File.join('..', __FILE__))
-$:.unshift File.dirname(__FILE__)
-
-#--
-# dependencies
-#++
-
-%w(rubygems halcyon/client).each {|dep|require dep}
-
-#--
-# module
-#++
+%w(halcyon halcyon/client/ssl).each {|dep|require dep}
 
 module Aurora
   
@@ -24,7 +7,7 @@ module Aurora
   # The Aurora Client makes interfacing with the Aurora server very simple and
   # easy, hiding away most of the communication details while still allowing
   # for a great deal of control in creating requests for the server.
-  class Client < Halcyon::Client::Base
+  class Client < Halcyon::Client
     
     attr_accessor :app
     
@@ -68,51 +51,4 @@ module Aurora
     
   end
   
-end
-
-require 'net/https'
-
-module Halcyon
-  class Client
-    
-    class Base
-      
-    private
-      
-      def request(req, headers={})
-        # define essential headers for Halcyon::Server's picky requirements
-        req["Content-Type"] = CONTENT_TYPE
-        req["User-Agent"] = USER_AGENT
-        
-        # apply provided headers
-        headers.each do |pair|
-          header, value = pair
-          req[header] = value
-        end
-        
-        # provide hook for modifying the headers
-        req = headers(req) if respond_to? :headers
-        
-        # prepare and send HTTP request
-        serv = Net::HTTP.new(@uri.host, @uri.port)
-        serv.use_ssl = true if @uri.scheme == 'https'
-        res = serv.start {|http|http.request(req)}
-        
-        # parse response
-        body = JSON.parse(res.body)
-        body.symbolize_keys!
-        
-        # handle non-successes
-        raise Halcyon::Client::Base::Exceptions.lookup(body[:status]).new unless res.kind_of? Net::HTTPSuccess
-        
-        # return response
-        body
-      rescue Halcyon::Exceptions::Base => e
-        # log exception if logger is in place
-        raise
-      end
-      
-    end
-    
-  end
 end

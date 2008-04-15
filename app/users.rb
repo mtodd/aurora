@@ -20,21 +20,21 @@ class Users < Application
       expiration = generate_expiration
       
       # save to the DB
-      self.db[:tokens].filter(:username => username).delete # removes previous tokens
-      self.db[:tokens] << {:username => username, :token => token, :expires_at => expiration}
+      Aurora::DB[:tokens].filter(:username => username).delete # removes previous tokens
+      Aurora::DB[:tokens] << {:username => username, :token => token, :expires_at => expiration}
       
       # create the user if not already in the DB
-      if self.db[:users].filter(:username => username).all.empty?
+      if Aurora::DB[:users].filter(:username => username).all.empty?
       	# retrieve the new user permissions
       	permissions = initialize_permissions(username)
       	
       	# create a new user
-      	self.db[:users] << {:username => username, :password => Digest::MD5.hexdigest(password), :permissions => permissions.to_json}
+      	Aurora::DB[:users] << {:username => username, :password => Digest::MD5.hexdigest(password), :permissions => permissions.to_json}
       	self.logger.info "#{username} cached."
       else
       	# or just cache the password so the user's profile is up-to-date
       	# if the authentication source is not available
-      	self.db[:users].filter(:username => username).update(:password => Digest::MD5.hexdigest(password))
+      	Aurora::DB[:users].filter(:username => username).update(:password => Digest::MD5.hexdigest(password))
       	self.logger.debug "#{username} updated."
       end
       
@@ -82,7 +82,7 @@ class Users < Application
     username, app, permission = params[:username], params[:app], params[:permission]
     
     # pull the permissions for the user
-    perms = JSON.parse(@db[:users][:username => username][:permissions])
+    perms = JSON.parse(Aurora::DB[:users][:username => username][:permissions])
     
     # test the permissions
     unless perms[app].nil?
@@ -98,7 +98,7 @@ class Users < Application
     username, app, permission, value = params[:username], params[:app], params[:permission], post[:value]
     
     # pull the permissions for the user
-    perms = JSON.parse(@db[:users][:username => username][:permissions])
+    perms = JSON.parse(Aurora::DB[:users][:username => username][:permissions])
     
     # test the permissions
     unless perms[app].nil?

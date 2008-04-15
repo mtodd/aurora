@@ -1,7 +1,5 @@
 class Application < Halcyon::Controller
   
-  attr_accessor :db
-  
   # The default unauthorized action which raises an Unauthorized exception
   def unauthorized
     raise Unauthorized.new
@@ -22,7 +20,7 @@ class Application < Halcyon::Controller
   
   # Generates a new time to expire from the minutes given, defaulting to the
   # number of minutes given as a token lifetime in the configuration file.
-  def generate_expiration(lifetime=Halcyon.config[:tokens][:lifetime])
+  def generate_expiration(lifetime = Halcyon.config[:tokens][:lifetime])
   	(Time.now + (lifetime.to_i*60))
   end
   
