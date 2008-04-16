@@ -1,0 +1,19 @@
+default_permissions:
+  - tests:
+      username: test
+    permissions:
+      app1:
+        role: user
+      app2:
+        role: admin
+  - tests:
+      samaccountname: rupert
+    permissions:
+      app1:
+        role: user
+      app2:
+        role: admin
+  - tests:
+      # catch-all
+    permissions:
+      # nothing!
