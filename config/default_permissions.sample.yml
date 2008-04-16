@@ -7,7 +7,7 @@ default_permissions:
       app2:
         role: admin
   - tests:
-      samaccountname: rupert
+      username: rupert
     permissions:
       app1:
         role: user
