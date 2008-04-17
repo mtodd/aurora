@@ -13,9 +13,7 @@ class Application < Halcyon::Controller
   # specific or dynamic default permissions, for instance connecting to LDAP
   # to determine department and granting permissions that way.
   def initialize_permissions(username)
-  	# by default, no permissions are setup
-  	# the returned value is JSON-ized
-  	{}
+  	Aurora.initialize_permissions(username)
   end
   
   # Generates a new time to expire from the minutes given, defaulting to the

@@ -1,7 +1,7 @@
 logging:
   type: Logger
-  file: /var/log/aurora.log
-  level: info
+  # file: /var/log/aurora.log
+  level: debug
 allow_from: all
 
 # App specific configurations

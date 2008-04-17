@@ -1,4 +1,4 @@
-default_permissions:
+rules:
   - tests:
       username: test
     permissions:

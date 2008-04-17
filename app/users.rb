@@ -26,7 +26,12 @@ class Users < Application
       # create the user if not already in the DB
       if Aurora::DB[:users].filter(:username => username).all.empty?
       	# retrieve the new user permissions
-      	permissions = initialize_permissions(username)
+      	begin
+      	  permissions = initialize_permissions(username)
+    	  rescue NoMethodError => e
+    	    self.logger.error e.message << "\n\t" << e.backtrace.join("\n\t") << "\n"
+    	    raise InternalServerError.new
+  	    end
       	
       	# create a new user
       	Aurora::DB[:users] << {:username => username, :password => Digest::MD5.hexdigest(password), :permissions => permissions.to_json}
