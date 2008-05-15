@@ -1,8 +1,10 @@
+# environment: production
+allow_from: all
+
 logging:
   type: Logger
   file: /var/log/aurora.log
   level: info
-allow_from: all
 
 # App specific configurations
 authenticator: simple
