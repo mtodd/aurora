@@ -1,19 +1,18 @@
-rules:
-  - tests:
-      username: test
-    permissions:
-      app1:
-        role: user
-      app2:
-        role: admin
-  - tests:
-      username: rupert
-    permissions:
-      app1:
-        role: user
-      app2:
-        role: admin
-  - tests:
-      # catch-all
-    permissions:
-      # nothing!
+- tests:
+    username: test
+  permissions:
+    app1:
+      role: user
+    app2:
+      role: admin
+- tests:
+    username: rupert
+  permissions:
+    app1:
+      role: user
+    app2:
+      role: admin
+- tests:
+    # catch-all
+  permissions:
+    # nothing!

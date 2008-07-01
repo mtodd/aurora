@@ -1,5 +1,6 @@
 # = Routes
 Halcyon::Application.route do |r|
+  
   # authentication routes
   r.match('/user/auth/:username').to(:controller => 'users', :action => 'auth')
   r.match('/token/auth/:token').to(:controller => 'tokens', :action => 'auth')
@@ -19,4 +20,5 @@ Halcyon::Application.route do |r|
   
   # failover
   {:action => 'not_found'}
+  
 end

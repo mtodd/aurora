@@ -14,7 +14,7 @@
 #   +find_default_permissions_for!+ finds the default permissions for the user
 module Aurora
   
-  VERSION = [0,3,0]
+  VERSION = [0,4,0]
   
   # The <tt>Authenticator</tt> namespace for loading authenticators.
   module Authenticator; end
@@ -29,7 +29,7 @@ module Aurora
     # Takes the rules defined in <tt>config/default_permissions.yml</tt> and
     # caches them (replacing empty rules with an empty hash).
     def process_rules!
-      Rules.collect! do |rule|
+      Halcyon.rules.collect! do |rule|
         {
           :tests => rule['tests'],
           :permissions => (rule['permissions'] || {})
@@ -57,7 +57,7 @@ module Aurora
       user = user.to_mash
       
       # process the rules against the user's data
-      Rules.each do |rule|
+      Halcyon.rules.each do |rule|
         # use the permissions if there's no test associated
         # (for users that don't meet any of the rules before)
         return rule[:permissions] if rule[:tests].nil?

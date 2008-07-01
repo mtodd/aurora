@@ -1,6 +1,17 @@
-# Database configuration
-adapter: mysql
-host: localhost
-username: aurora_user
-password: password
-database: aurora
+defaults: &defaults
+  adapter: mysql
+  host: localhost
+  username: aurora_user
+  password: password
+
+development:
+  database: aurora_development
+  <<: *defaults
+
+test:
+  database: aurora_test
+  <<: *defaults
+
+production:
+  database: aurora
+  <<: *defaults
